@@ -75,7 +75,7 @@ class Range extends React.Component {
       const newValues = value.map((v) => {
         return utils.ensureValueInRange(v, nextProps);
       });
-      this.props.onChange(newValues);
+     this.props.onChange(newValues);
     }
   }
 
@@ -89,7 +89,7 @@ class Range extends React.Component {
     }
 
     const data = { ...this.state, ...state };
-    const changedValue = data.bounds;
+    const changedValue = data.bounds.filter((_, index) => ! props.hiddenDots.includes(index));
     props.onChange(changedValue);
   }
 
