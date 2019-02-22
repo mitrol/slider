@@ -29,6 +29,7 @@ class Range extends React.Component {
     allowCross: true,
     pushable: false,
     tabIndex: [],
+    excludeDots: []
   };
 
   constructor(props) {
@@ -330,6 +331,7 @@ class Range extends React.Component {
     const {
       handle,
       bounds,
+      recent
     } = this.state;
     const {
       prefixCls,
@@ -342,29 +344,33 @@ class Range extends React.Component {
       trackStyle,
       handleStyle,
       tabIndex,
+      excludeDots
     } = this.props;
 
     const offsets = bounds.map(v => this.calcOffset(v));
 
     const handleClassName = `${prefixCls}-handle`;
-    const handles = bounds.map((v, i) => handleGenerator({
-      className: classNames({
-        [handleClassName]: true,
-        [`${handleClassName}-${i + 1}`]: true,
-      }),
-      prefixCls,
-      vertical,
-      offset: offsets[i],
-      value: v,
-      dragging: handle === i,
-      index: i,
-      tabIndex: tabIndex[i] || 0,
-      min,
-      max,
-      disabled,
-      style: handleStyle[i],
-      ref: h => this.saveHandle(i, h),
-    }));
+    const handles = bounds.map((v, i) => {
+      return handleGenerator({
+        className: classNames({
+          [handleClassName]: true,
+          [`${handleClassName}-${i + 1}`]: true,
+          disabled: excludeDots.includes(i)
+        }),
+        prefixCls,
+        vertical,
+        offset: offsets[i],
+        value: v,
+        dragging: handle === i,
+        index: i,
+        tabIndex: tabIndex[i] || 0,
+        min,
+        max,
+        disabled,
+        style: handleStyle[i],
+        ref: h => this.saveHandle(i, h),
+      })
+    });
 
     const tracks = bounds.slice(0, -1).map((_, index) => {
       const i = index + 1;

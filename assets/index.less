@@ -59,6 +59,7 @@
     border: solid 2px tint(@primary-color, 50%);
     background-color: #fff;
     touch-action: pan-x;
+    z-index: 1;
 
     &:focus {
       border-color: tint(@primary-color, 20%);
@@ -80,6 +81,14 @@
       box-shadow: 0 0 5px tint(@primary-color, 20%);
       cursor: -webkit-grabbing;
       cursor: grabbing;
+    }
+
+    &.disabled {
+      border-color: @disabledColor;
+      box-shadow: none;
+      background-color: #fff;
+      cursor: not-allowed;
+      z-index: 0;
     }
   }
 
