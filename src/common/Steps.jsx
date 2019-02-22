@@ -20,9 +20,9 @@ const calcPoints = (vertical, marks, dots, step, min, max) => {
 };
 
 const Steps = ({ prefixCls, vertical, marks, dots, step, included,
-  lowerBound, upperBound, max, min, dotStyle, activeDotStyle }) => {
+  lowerBound, upperBound, max, min, dotStyle, activeDotStyle, hiddenMarks }) => {
   const range = max - min;
-  const elements = calcPoints(vertical, marks, dots, step, min, max).map((point) => {
+  const elements = calcPoints(vertical, marks, dots, step, min, max).map((point, index) => {
     const offset = `${Math.abs(point - min) / range * 100}%`;
 
     const isActived = (!included && point === upperBound) ||
@@ -35,6 +35,7 @@ const Steps = ({ prefixCls, vertical, marks, dots, step, included,
     const pointClassName = classNames({
       [`${prefixCls}-dot`]: true,
       [`${prefixCls}-dot-active`]: isActived,
+      hidden: hiddenMarks.includes(index)
     });
 
     return <span className={pointClassName} style={style} key={point} />;
@@ -56,6 +57,7 @@ Steps.propTypes = {
   step: PropTypes.number,
   marks: PropTypes.object,
   vertical: PropTypes.bool,
+  hiddenMarks: PropTypes.arrayOf(PropTypes.number)
 };
 
 export default Steps;

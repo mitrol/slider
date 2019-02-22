@@ -211,5 +211,29 @@ ReactDOM.render(
       <p>Range as child component</p>
       <PureRenderRange />
     </div>
+    <div style={style}>
+      <p>Hidden dots</p>
+      <Range allowCross={false} defaultValue={[0, 10, 20, 100]} onChange={log} hiddenDots={[0, 3]} />
+    </div>
+    <div style={style}>
+      <p>Hidden dots and marks</p>
+      <Range
+        allowCross={false}
+        defaultValue={[0, 1800, 3600, 5400, 10800]}
+        onChange={log}
+        max={10800}
+        marks={{
+          '0': '0 seg.',
+          '1800': '30:00',
+          '3600': '60:00',
+          '5400': '90:00',
+          '7200': '120:00',
+          '9000': '150:00',
+          '10800': '180:00'
+        }}
+        hiddenDots={[0, 4]}
+        hiddenMarks={[0, 6]}
+      />
+    </div>
   </div>
   , document.getElementById('__react-content'));

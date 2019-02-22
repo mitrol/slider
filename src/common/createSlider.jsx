@@ -101,10 +101,6 @@ export default function createSlider(Component) {
 
     onMouseDown = (e) => {
       if (e.button !== 0) { return; }
-      
-      if (this.props.excludeDots.includes(this.state.recent)) {
-        return
-      }
 
       const isVertical = this.props.vertical;
       let position = utils.getMousePosition(isVertical, e);
@@ -184,10 +180,6 @@ export default function createSlider(Component) {
     }
 
     onKeyDown = (e) => {
-      if (this.props.excludeDots.includes(this.state.recent)) {
-        return
-      }
-
       if (this.sliderRef && utils.isEventFromHandle(e, this.handlesRefs)) {
         this.onKeyboard(e);
       }
@@ -340,6 +332,7 @@ export default function createSlider(Component) {
             min={min}
             dotStyle={dotStyle}
             activeDotStyle={activeDotStyle}
+            hiddenMarks={this.props.hiddenMarks}
           />
           {handles}
           <Marks

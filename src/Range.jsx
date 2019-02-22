@@ -22,6 +22,8 @@ class Range extends React.Component {
     tabIndex: PropTypes.arrayOf(PropTypes.number),
     min: PropTypes.number,
     max: PropTypes.number,
+    hiddenDots: PropTypes.arrayOf(PropTypes.number),
+    hiddenMarks: PropTypes.arrayOf(PropTypes.number)
   };
 
   static defaultProps = {
@@ -29,7 +31,8 @@ class Range extends React.Component {
     allowCross: true,
     pushable: false,
     tabIndex: [],
-    excludeDots: []
+    hiddenDots: [],
+    hiddenMarks: []
   };
 
   constructor(props) {
@@ -68,6 +71,7 @@ class Range extends React.Component {
     this.setState({ bounds: nextBounds });
 
     if (value.some(v => utils.isValueOutOfRange(v, nextProps))) {
+     
       const newValues = value.map((v) => {
         return utils.ensureValueInRange(v, nextProps);
       });
@@ -90,17 +94,22 @@ class Range extends React.Component {
   }
 
   onStart(position) {
+    const value = this.calcValueByPos(position);
+    const closestBound = this.getClosestBound(value);
+    const prevMovedHandleIndex = this.getBoundNeedMoving(value, closestBound);
+
+    if (this.props.hiddenDots.includes(prevMovedHandleIndex)) {
+      return;
+    }
+
+    this.prevMovedHandleIndex = prevMovedHandleIndex;
     const props = this.props;
     const state = this.state;
     const bounds = this.getValue();
     props.onBeforeChange(bounds);
 
-    const value = this.calcValueByPos(position);
     this.startValue = value;
     this.startPosition = position;
-
-    const closestBound = this.getClosestBound(value);
-    this.prevMovedHandleIndex = this.getBoundNeedMoving(value, closestBound);
 
     this.setState({
       handle: this.prevMovedHandleIndex,
@@ -330,8 +339,7 @@ class Range extends React.Component {
   render() {
     const {
       handle,
-      bounds,
-      recent
+      bounds
     } = this.state;
     const {
       prefixCls,
@@ -344,7 +352,7 @@ class Range extends React.Component {
       trackStyle,
       handleStyle,
       tabIndex,
-      excludeDots
+      hiddenDots
     } = this.props;
 
     const offsets = bounds.map(v => this.calcOffset(v));
@@ -355,7 +363,7 @@ class Range extends React.Component {
         className: classNames({
           [handleClassName]: true,
           [`${handleClassName}-${i + 1}`]: true,
-          disabled: excludeDots.includes(i)
+          hidden: hiddenDots.includes(i)
         }),
         prefixCls,
         vertical,
@@ -376,7 +384,7 @@ class Range extends React.Component {
       const i = index + 1;
       const trackClassName = classNames({
         [`${prefixCls}-track`]: true,
-        [`${prefixCls}-track-${i}`]: true,
+        [`${prefixCls}-track-${i}`]: true
       });
       return (
         <Track
