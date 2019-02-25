@@ -220,7 +220,7 @@ ReactDOM.render(
       <Range
         allowCross={false}
         defaultValue={[0, 1800, 3600, 5400, 10800]}
-        onChange={log}
+        onChange={(value, withoutHiddenDots) => console.log(withoutHiddenDots)}
         max={10800}
         marks={{
           '0': '0 seg.',

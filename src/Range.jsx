@@ -75,7 +75,12 @@ class Range extends React.Component {
       const newValues = value.map((v) => {
         return utils.ensureValueInRange(v, nextProps);
       });
-     this.props.onChange(newValues);
+
+      let newValuesWithoutHiddenDots = [];
+      if (this.props.hiddenDots && this.props.hiddenDots.length > 0) {
+        newValuesWithoutHiddenDots = newValues.filter((_, index) => !this.props.hiddenDots.includes(index));
+      }
+     this.props.onChange(newValues, newValuesWithoutHiddenDots);
     }
   }
 
@@ -89,8 +94,13 @@ class Range extends React.Component {
     }
 
     const data = { ...this.state, ...state };
-    const changedValue = data.bounds.filter((_, index) => ! props.hiddenDots.includes(index));
-    props.onChange(changedValue);
+    const changedValue = data.bounds;
+  
+    let valueWithoutHiddenDots = [];
+    if (props.hiddenDots && props.hiddenDots.length > 0) {
+      valueWithoutHiddenDots = changedValue.filter((_, index) => !props.hiddenDots.includes(index));
+    }
+    props.onChange(changedValue, valueWithoutHiddenDots);
   }
 
   onStart(position) {
