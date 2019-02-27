@@ -22,6 +22,8 @@ class Range extends React.Component {
     tabIndex: PropTypes.arrayOf(PropTypes.number),
     min: PropTypes.number,
     max: PropTypes.number,
+    hiddenDots: PropTypes.arrayOf(PropTypes.number),
+    hiddenMarks: PropTypes.arrayOf(PropTypes.number)
   };
 
   static defaultProps = {
@@ -29,6 +31,8 @@ class Range extends React.Component {
     allowCross: true,
     pushable: false,
     tabIndex: [],
+    hiddenDots: [],
+    hiddenMarks: []
   };
 
   constructor(props) {
@@ -67,10 +71,16 @@ class Range extends React.Component {
     this.setState({ bounds: nextBounds });
 
     if (value.some(v => utils.isValueOutOfRange(v, nextProps))) {
+     
       const newValues = value.map((v) => {
         return utils.ensureValueInRange(v, nextProps);
       });
-      this.props.onChange(newValues);
+
+      let newValuesWithoutHiddenDots = [];
+      if (this.props.hiddenDots && this.props.hiddenDots.length > 0) {
+        newValuesWithoutHiddenDots = newValues.filter((_, index) => !this.props.hiddenDots.includes(index));
+      }
+     this.props.onChange(newValues, newValuesWithoutHiddenDots);
     }
   }
 
@@ -85,21 +95,31 @@ class Range extends React.Component {
 
     const data = { ...this.state, ...state };
     const changedValue = data.bounds;
-    props.onChange(changedValue);
+  
+    let valueWithoutHiddenDots = [];
+    if (props.hiddenDots && props.hiddenDots.length > 0) {
+      valueWithoutHiddenDots = changedValue.filter((_, index) => !props.hiddenDots.includes(index));
+    }
+    props.onChange(changedValue, valueWithoutHiddenDots);
   }
 
   onStart(position) {
+    const value = this.calcValueByPos(position);
+    const closestBound = this.getClosestBound(value);
+    const prevMovedHandleIndex = this.getBoundNeedMoving(value, closestBound);
+
+    if (this.props.hiddenDots.includes(prevMovedHandleIndex)) {
+      return;
+    }
+
+    this.prevMovedHandleIndex = prevMovedHandleIndex;
     const props = this.props;
     const state = this.state;
     const bounds = this.getValue();
     props.onBeforeChange(bounds);
 
-    const value = this.calcValueByPos(position);
     this.startValue = value;
     this.startPosition = position;
-
-    const closestBound = this.getClosestBound(value);
-    this.prevMovedHandleIndex = this.getBoundNeedMoving(value, closestBound);
 
     this.setState({
       handle: this.prevMovedHandleIndex,
@@ -329,7 +349,7 @@ class Range extends React.Component {
   render() {
     const {
       handle,
-      bounds,
+      bounds
     } = this.state;
     const {
       prefixCls,
@@ -342,35 +362,39 @@ class Range extends React.Component {
       trackStyle,
       handleStyle,
       tabIndex,
+      hiddenDots
     } = this.props;
 
     const offsets = bounds.map(v => this.calcOffset(v));
 
     const handleClassName = `${prefixCls}-handle`;
-    const handles = bounds.map((v, i) => handleGenerator({
-      className: classNames({
-        [handleClassName]: true,
-        [`${handleClassName}-${i + 1}`]: true,
-      }),
-      prefixCls,
-      vertical,
-      offset: offsets[i],
-      value: v,
-      dragging: handle === i,
-      index: i,
-      tabIndex: tabIndex[i] || 0,
-      min,
-      max,
-      disabled,
-      style: handleStyle[i],
-      ref: h => this.saveHandle(i, h),
-    }));
+    const handles = bounds.map((v, i) => {
+      return handleGenerator({
+        className: classNames({
+          [handleClassName]: true,
+          [`${handleClassName}-${i + 1}`]: true,
+          hidden: hiddenDots.includes(i)
+        }),
+        prefixCls,
+        vertical,
+        offset: offsets[i],
+        value: v,
+        dragging: handle === i,
+        index: i,
+        tabIndex: tabIndex[i] || 0,
+        min,
+        max,
+        disabled,
+        style: handleStyle[i],
+        ref: h => this.saveHandle(i, h),
+      })
+    });
 
     const tracks = bounds.slice(0, -1).map((_, index) => {
       const i = index + 1;
       const trackClassName = classNames({
         [`${prefixCls}-track`]: true,
-        [`${prefixCls}-track-${i}`]: true,
+        [`${prefixCls}-track-${i}`]: true
       });
       return (
         <Track

@@ -332,6 +332,7 @@ export default function createSlider(Component) {
             min={min}
             dotStyle={dotStyle}
             activeDotStyle={activeDotStyle}
+            hiddenMarks={this.props.hiddenMarks}
           />
           {handles}
           <Marks
