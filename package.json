@@ -1,6 +1,6 @@
 {
   "name": "@mitrol/rc-slider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Slider UI component for React, we have forked this repo, because we need to hide the first and last dot and the library does not support that functionality in this moment.",
   "keywords": [
     "react",
